@@ -43,7 +43,6 @@ class App(customtkinter.CTk):
             text="YouTube Downloader",
             font=customtkinter.CTkFont(size=20, weight="bold"),
         )
-        self.status = None
 
         self.progressbar = customtkinter.CTkProgressBar(
             master=self,
@@ -69,6 +68,7 @@ class App(customtkinter.CTk):
                 size=10,
             ),
         )
+        self.status = customtkinter.CTkLabel(master=self, text=f"", text_color="green")
         self.initialPack()
 
         self.resizable(False, False)
@@ -143,6 +143,7 @@ class App(customtkinter.CTk):
                 allow_oauth_cache=True,
             )
             self.showStatus("Download started")
+            self.showProgressBar()
         except:
             self.showStatus("Invalid link", green=False)
             self.SwitchButtonState(False)
@@ -164,8 +165,10 @@ class App(customtkinter.CTk):
         self.progressbar.set(0)
 
     def updateProgressBar(self, val):
-        self.progressbar.set(val)
         self.showStatus(f"Downloading {val}%")
+
+        val = val / 100
+        self.progressbar.set(val)
 
     def hideProgressBar(self):
         self.progressbar.pack_forget()
@@ -191,25 +194,24 @@ class App(customtkinter.CTk):
         thread = Thread(target=self.downloadYouTubeVid, args=(url,))
         thread.start()
         self.SwitchButtonState(disabled=True)
-        self.showProgressBar()
 
     def showStatus(self, status, green=True):
-        if self.status != None:
-            self.status.pack_forget()
-            self.status = None
+        try:
+            self.status.pack_info()
+        except:
+            try:
+                self.status.pack_configure(after=self.progressbar)
+            except:
+                self.status.pack_configure(after=self.DownloadButton)
         if green:
-            self.status = customtkinter.CTkLabel(
-                master=self, text=f"{status}", text_color="green"
-            )
-        else:
-            self.status = customtkinter.CTkLabel(
-                master=self, text=f"{status}", text_color="red"
+            self.status.configure(
+                require_redraw=True, text=f"{status}", text_color="green"
             )
 
-        try:
-            self.status.pack_configure(after=self.progressbar)
-        except:
-            self.status.pack_configure(after=self.DownloadButton)
+        else:
+            self.status.configure(
+                require_redraw=True, text=f"{status}", text_color="red"
+            )
 
     def hideStatus(self):
         self.status.pack_forget()
