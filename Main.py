@@ -11,7 +11,7 @@ import sys
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme(
-    "blue"
+    "green"
 )  # Themes: "blue" (standard), "green", "dark-blue"
 
 
@@ -57,7 +57,7 @@ class App(customtkinter.CTk):
             text="Start Download",
             text_color_disabled="white",
         )
-
+        print(self.DownloadButton._fg_color)
         self.creditsLabel = customtkinter.CTkLabel(
             self,
             text="Made and Designed by Ben Esposito",
@@ -99,7 +99,6 @@ class App(customtkinter.CTk):
         except:
             pass
 
-    
     def getIfMP4(self):
         Mp4Choice = self.DropDown.get()
         if Mp4Choice == "MP4 (Video)":
@@ -131,7 +130,6 @@ class App(customtkinter.CTk):
             b = download.streams.filter(file_extension="mp4")
         else:
             b = download.streams.filter(only_audio=True)
-        
 
         if b.first() != None:
             b.first().download(self.downloads_path)
@@ -162,7 +160,7 @@ class App(customtkinter.CTk):
 
         else:
             self.DownloadButton.configure(
-                require_redraw=True, fg_color="#1F6AA5", state=customtkinter.NORMAL
+                require_redraw=True, fg_color="#2FA572", state=customtkinter.NORMAL
             )
 
     def startDownload(self):
