@@ -161,17 +161,18 @@ class App(customtkinter.CTk):
             self.hideProgressBar()
             return
         if self.getIfMP4():
-            b = download.streams.filter(file_extension="mp4")
+            b = download.streams.get_highest_resolution()
+            b.download(self.downloads_path)
         else:
             b = download.streams.filter(only_audio=True)
 
-        if b.first() != None:
-            b.first().download(self.downloads_path)
-        else:
-            self.showStatus(f"Failed to download", green=False)
-            self.initialSize = None
-            self.SwitchButtonState(False)
-            self.hideProgressBar()
+            if b.first() != None:
+                b.first().download(self.downloads_path)
+            else:
+                self.showStatus(f"Failed to download", green=False)
+                self.initialSize = None
+                self.SwitchButtonState(False)
+                self.hideProgressBar()
 
     def showProgressBar(self):
         self.progressbar.pack_configure(after=self.DownloadButton)
