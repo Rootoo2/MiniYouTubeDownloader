@@ -1,4 +1,5 @@
 import subprocess
+import tkinter
 import customtkinter
 import pytube
 from pathlib import Path
@@ -66,9 +67,36 @@ class App(customtkinter.CTk):
             ),
         )
         self.status = customtkinter.CTkLabel(master=self, text=f"", text_color="green")
+        self.setUpContextMenu()
         self.initialPack()
 
         self.resizable(False, False)
+
+    def do_popup(self, event, frame):
+        try:
+            frame.tk_popup(event.x_root, event.y_root)
+        finally:
+            frame.grab_release()
+
+    def setUpContextMenu(self):
+        RightClickMenu = tkinter.Menu(
+            self.URL_Input,
+            tearoff=False,
+            background="#565b5e",
+            fg="white",
+            borderwidth=0,
+            bd=0,
+        )
+
+        RightClickMenu.add_command(
+            label="Paste",
+            command=lambda: self.URL_Input.insert(tkinter.END, self.clipboard_get()),
+        )
+
+        self.URL_Input.bind(
+            "<Button-3>", lambda event: self.do_popup(event, frame=RightClickMenu)
+        )
+        self.bind("<1>", lambda event: event.widget.focus_set())
 
     def progCheck(self, stream, datachunk, byteRemaining):
         if byteRemaining != None:
