@@ -126,6 +126,12 @@ class App(customtkinter.CTk):
             self.SwitchButtonState(False)
             self.hideProgressBar()
             return
+        if download.age_restricted:
+            self.showStatus(f"Video is age restricted", green=False)
+            self.initialSize = None
+            self.SwitchButtonState(False)
+            self.hideProgressBar()
+            return
         if self.getIfMP4():
             b = download.streams.filter(file_extension="mp4")
         else:
