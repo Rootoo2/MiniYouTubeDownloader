@@ -4,15 +4,12 @@ import pytube
 from pathlib import Path
 
 from threading import Thread
-from moviepy.editor import VideoFileClip
-from time import sleep
+
 
 import os
 import sys
 
-customtkinter.set_appearance_mode(
-    "System"
-)  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme(
     "blue"
 )  # Themes: "blue" (standard), "green", "dark-blue"
@@ -93,35 +90,16 @@ class App(customtkinter.CTk):
             self.hideProgressBar()
 
             if os.path.exists(filePath):
-                filePath = self.checkFileFormat(filePath=filePath)
+                if not self.getIfMP4():
+                    oldFilePath = filePath
+                    filePath = str(oldFilePath).replace("mp4", "mp3")
+                    os.rename(oldFilePath, filePath)
                 self.showStatus("Download Complete")
                 subprocess.Popen(rf"explorer /select,{filePath}")
         except:
             pass
 
-    def checkFileFormat(self, filePath):
-        if self.getIfMP4():
-            return filePath
-        else:
-            originalFile = filePath
-            self.updateProgressBar(100)
-            self.showStatus("Converting to MP3")
-            video = VideoFileClip(filePath)
-            OriginalBaseName = os.path.basename(filePath)
-            NewbaseName = str(OriginalBaseName).replace("mp4", "mp3")
-            filePath = str(filePath).replace(OriginalBaseName, NewbaseName)
-            video.audio.write_audiofile(filePath)
-            video.close()
-            sleep(0.5)
-            try:
-                print(originalFile)
-
-                os.remove(originalFile)
-            except Exception as e:
-                print(e)
-
-            return filePath
-
+    
     def getIfMP4(self):
         Mp4Choice = self.DropDown.get()
         if Mp4Choice == "MP4 (Video)":
@@ -149,8 +127,11 @@ class App(customtkinter.CTk):
             self.SwitchButtonState(False)
             self.hideProgressBar()
             return
-
-        b = download.streams.filter(file_extension="mp4")
+        if self.getIfMP4():
+            b = download.streams.filter(file_extension="mp4")
+        else:
+            b = download.streams.filter(only_audio=True)
+        
 
         if b.first() != None:
             b.first().download(self.downloads_path)
